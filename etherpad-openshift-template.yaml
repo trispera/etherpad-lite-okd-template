@@ -100,8 +100,15 @@ objects:
           ports:
           - containerPort: 9001
             protocol: TCP
+          volumeMounts:
+          - mountPath: /opt/etherpad-lite/var
+            name: plugins
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+        volumes:
+        - name: plugins
+          persistentVolumeClaim:
+            claimName: etherpad 
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -222,6 +229,23 @@ objects:
     resources:
       requests:
         storage: 10Gi
+    storageClassName: standard-csi
+  status: {}
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: etherpad-persistent
+    name: etherpad
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
     storageClassName: standard-csi
   status: {}
 
